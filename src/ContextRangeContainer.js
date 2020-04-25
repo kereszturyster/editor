@@ -192,7 +192,7 @@ export class ContextRangeContainer
   {
     let $elements = $();
     for (let i = 0; i < this.ranges.length; i++) {
-      const element = this.ranges[i].createTextElement();
+      const element = this.ranges[i].getTextElement();
       $elements = $elements.add(element);
     }
     return $elements;
@@ -234,9 +234,9 @@ export class ContextRangeContainer
   getContainers()
   {
     const $contexts = this.getContexts();
-    let $results = $contexts.filter('p,h1,h2,h3,h4,h5,h6,div,td').not(this.$container);
+    let $results = $contexts.filter('p,h1,h2,h3,h4,h5,h6,div,td,th').not(this.$container);
     if ($results.length === 0) {
-      $results = $contexts.parents('p,h1,h2,h3,h4,h5,h6,div,td').not(this.$container);
+      $results = $contexts.parents('p,h1,h2,h3,h4,h5,h6,div,td,th').not(this.$container);
     }
     return $results;
   }

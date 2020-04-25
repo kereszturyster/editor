@@ -7,6 +7,6 @@ $(function(){
     console.log("Containers", containers.getContainers().get());
     console.log("Context", containers.getContexts().get());
     console.log("Images", containers.getImages().get());
-    // console.log("TextElements", containers.getTextElements().get());
+    console.log("TextElements", containers.getTextElements().get());
   });
 });

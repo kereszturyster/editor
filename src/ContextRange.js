@@ -25,6 +25,12 @@ export class ContextRange
      * @type {HTMLElement}
      */
     this.element = null;
+
+    /**
+     * @private
+     * @type {boolean}
+     */
+    this.createElement = false;
   }
 
   /**
@@ -60,22 +66,36 @@ export class ContextRange
    * @access public
    * @return {HTMLElement}
    */
-  createTextElement()
+  getTextElement()
   {
     if (!this.element) {
       const contextLength = this.context.textContent.length;
-      const content = this.origin.extractContents();
+      const content = this.origin.cloneContents();
 
       if (content.textContent.length === 0 || contextLength === content.textContent.length) {
         this.element = this.context;
+
+        this.createElement = false;
       } else {
-        // TODO Nem minden esetben kell létrehozni
         this.element = document.createElement('span');
-        this.origin.insertNode(this.element);
+        this.element.appendChild(content);
+
+        this.createElement = true;
       }
-      this.element.appendChild(content);
     }
 
     return this.element;
+  }
+
+  /**
+   * @access public
+   * @return {HTMLElement}
+   */
+  createTextElement()
+  {
+    if(this.createElement) {
+      this.origin.deleteContents();
+      this.origin.insertNode(this.element);
+    }
   }
 }
