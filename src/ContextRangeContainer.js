@@ -5,10 +5,10 @@ export class ContextRangeContainer
 {
   /**
    * @public
-   * @param $container {jQuery}
+   * @param containerSelector {String}
    * @constructor
    */
-  constructor($container)
+  constructor(containerSelector)
   {
     /**
      * @protected
@@ -20,7 +20,7 @@ export class ContextRangeContainer
      * @protected
      * @type {jQuery}
      */
-    this.$container = $container;
+    this.$container = $(containerSelector);
     this.$container.keydown(function (e)
     {
       if (e.keyCode === 13) {
@@ -178,7 +178,7 @@ export class ContextRangeContainer
       } else {
         this.addRange(range);
       }
-      $.event.trigger('createRanges');
+      $.event.trigger('ContextRangeContainer::createRanges');
     }
   }
 
@@ -244,7 +244,7 @@ export class ContextRangeContainer
   onCreateRanges(callback)
   {
     if (typeof callback === 'function') {
-      $(document).bind('createRanges', () =>
+      $(document).bind('ContextRangeContainer::createRanges', () =>
       {
         callback(this);
       });
