@@ -43,11 +43,26 @@ export class ContextRange
       this.createElements = true;
 
       const content = this.origin.cloneContents();
-      console.log(content.childNodes);
-      const element = document.createElement('span');
-      element.appendChild(content);
-
-      this.elements.push(element);
+      if(this.origin.startContainer === this.origin.endContainer){
+        const element = document.createElement('span');
+        element.appendChild(content);
+        this.elements.push(element);
+      }
+      else {
+        for (let i = 0; i < content.childNodes.length; i++){
+          let node = content.childNodes[i];
+          // if(i === 0){
+          //   node = this.origin.startContainer;
+          // }
+          // if(i === content.childNodes.length - 1){
+          //   node = this.origin.startContainer;
+          // }
+          debugger;
+          const element = document.createElement('span');
+          element.appendChild(node);
+          this.elements.push(element);
+        }
+      }
     }
   }
 
