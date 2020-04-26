@@ -49,6 +49,23 @@ export class ContextRange
       for (let i = 0; i < nodes.length; i++){
         let element = nodes[i];
 
+        // let clone = range.cloneRange();
+        // clone.setEnd(node, node.childNodes.length);
+        // clone.setStart(node, 0);
+
+        if(nodes[i].nodeType === Node.TEXT_NODE) {
+          element = document.createElement('span');
+          element.appendChild(nodes[i]);
+        }
+        else {
+          // if(i === 0){
+          //   element = document.createElement('span');
+          //   for (let j = 0; j < nodes[i].childNodes.length; j++) {
+          //     element.appendChild(nodes[i].childNodes[j]);
+          //   }
+          // }
+        }
+
         // if(i === 0){
         //   node = this.origin.startContainer;
         // }
@@ -56,10 +73,7 @@ export class ContextRange
         //   node = this.origin.startContainer;
         // }
 
-        if(nodes[i].nodeType === Node.TEXT_NODE) {
-          element = document.createElement('span');
-          element.appendChild(nodes[i]);
-        }
+
         this.elements.push(element);
       }
     }
