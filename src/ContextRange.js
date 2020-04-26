@@ -23,7 +23,7 @@ export class ContextRange
      * @private
      * @type {boolean}
      */
-    this.createElements = false;
+    this.isCreateElements = false;
 
     /**
      * Elemek létrehozása
@@ -37,42 +37,28 @@ export class ContextRange
     const content = this.origin.cloneContents();
 
     if (content.textContent.length === 0 || contextLength === content.textContent.length) {
-      this.createElements = false;
+      this.isCreateElements = false;
       this.elements.push(context);
     } else {
-      this.createElements = true;
+      this.isCreateElements = true;
 
       let nodes = [];
       for (let i = 0; i < content.childNodes.length; i++) {
         nodes.push(content.childNodes[i]);
       }
+      // TODO több range kell
       for (let i = 0; i < nodes.length; i++){
         let element = nodes[i];
-
-        // let clone = range.cloneRange();
-        // clone.setEnd(node, node.childNodes.length);
-        // clone.setStart(node, 0);
-
         if(nodes[i].nodeType === Node.TEXT_NODE) {
           element = document.createElement('span');
           element.appendChild(nodes[i]);
         }
-        else {
-          // if(i === 0){
-          //   element = document.createElement('span');
-          //   for (let j = 0; j < nodes[i].childNodes.length; j++) {
-          //     element.appendChild(nodes[i].childNodes[j]);
-          //   }
-          // }
+        else if(i === 0 || i === nodes.length - 1){
+          element = document.createElement('span');
+          while(nodes[i].firstChild) {
+            element.appendChild(nodes[i].firstChild);
+          }
         }
-
-        // if(i === 0){
-        //   node = this.origin.startContainer;
-        // }
-        // if(i === content.childNodes.length - 1){
-        //   node = this.origin.startContainer;
-        // }
-
 
         this.elements.push(element);
       }
@@ -111,7 +97,7 @@ export class ContextRange
    */
   createElements()
   {
-    if(this.createElements) {
+    if(this.isCreateElements) {
       this.origin.deleteContents();
 
       const elements = this.getElements();

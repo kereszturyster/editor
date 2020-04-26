@@ -115,7 +115,9 @@ export class ContextRangeContainer
    */
   getTextElements()
   {
-    return this.getElements();
+    const elements = this.getElements();
+    this.range.createElements();
+    return elements;
   }
 
   /**
