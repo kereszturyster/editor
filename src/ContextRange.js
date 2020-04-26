@@ -51,17 +51,23 @@ export class ContextRange
       else {
         for (let i = 0; i < content.childNodes.length; i++){
           let node = content.childNodes[i];
+          let element = node;
+
           // if(i === 0){
           //   node = this.origin.startContainer;
           // }
           // if(i === content.childNodes.length - 1){
           //   node = this.origin.startContainer;
           // }
-          debugger;
-          const element = document.createElement('span');
-          element.appendChild(node);
+
+          if (node.nodeType === Node.TEXT_NODE) {
+            element = document.createElement('span');
+            element.appendChild(node);
+          }
+          console.log(node, element);
           this.elements.push(element);
         }
+
       }
     }
   }
