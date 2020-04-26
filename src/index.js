@@ -3,10 +3,10 @@ import {ContextRangeContainer} from "./ContextRangeContainer";
 
 $(function(){
   const containers = new ContextRangeContainer(".container");
-  containers.onCreateRanges(() => {
-    console.log("Containers", containers.getContainers().get());
-    console.log("Context", containers.getContexts().get());
-    console.log("Images", containers.getImages().get());
+  containers.onCreateRange(() => {
+    console.log("Containers", containers.getContainer().get());
+    console.log("Context", containers.getContext().get());
+    console.log("Images", containers.getImage().get());
     console.log("TextElements", containers.getTextElements().get());
   });
 });

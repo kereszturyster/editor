@@ -12,9 +12,9 @@ export class ContextRangeContainer
   {
     /**
      * @protected
-     * @type {Array<ContextRange>}
+     * @type {ContextRange}
      */
-    this.ranges = [];
+    this.range = null;
 
     /**
      * @protected
@@ -37,14 +37,14 @@ export class ContextRangeContainer
       if (e.keyCode === 13
         || e.keyCode === 37 || e.keyCode === 38
         || e.keyCode === 39 || e.keyCode === 40) {
-        this.createRanges();
+        this.createRange();
       }
 
     });
     // focusout || mouseup
     this.$container.mouseup((e) =>
     {
-      this.createRanges();
+      this.createRange();
     });
 
     this.$container.find('img').mousedown((e) =>
@@ -56,25 +56,6 @@ export class ContextRangeContainer
       this.tmpRange = range;
       e.preventDefault();
     });
-  }
-
-  /**
-   * <div id="module-live-editor" contenteditable="true" >
-   *      <p> fsdfsdsdfsd  sd fdfds  <span >fsdfdsf|dssdf</span> sdfsdffdssdfdfs <span>fs|dfdsfd</span></p>
-   * </div>
-   *
-   * Multi kijelölés legalább két monjuk span keresztül van a kijelőlés,
-   * de ezek csak testvérelemek lehetnek az adott feltétellel
-   *
-   * @access private
-   * @param {Range} range
-   * @return {boolean}
-   */
-  isMultiRange(range)
-  {
-    // TODO ez most csak két vagy több testvér elemre igaz, ezért ha egymásba vannak az elemek ágyazva rossz lesz a kijelölés
-    return range.startContainer.parentNode !== range.endContainer.parentNode &&
-      range.startContainer.parentNode.parentNode === range.endContainer.parentNode.parentNode
   }
 
   /**
@@ -97,49 +78,18 @@ export class ContextRangeContainer
 
   /**
    * @access public
-   * @return {Array<ContextRange>}
-   */
-  getRanges()
-  {
-    return this.ranges;
-  }
-
-  /**
-   * @access public
-   * @param index {Number}
    * @return {ContextRange}
    */
-  getRange(index)
+  getRange()
   {
-    index = index || 0;
-    return this.ranges[index];
-  }
-
-  /**
-   * @access public
-   * @param range {Range}
-   * @return {ContextRange}
-   */
-  addRange(range)
-  {
-    if (range.startContainer !== range.endContainer && range.endOffset === 0) {
-      // TODO nem a kezdő konténert kell nézni hanem az elözó testvér elemet
-      range.setEnd(range.startContainer.parentNode, range.startContainer.parentNode.childNodes.length);
-    }
-    // kijelöléshez tartozó elem meghatározása
-    let context = range.commonAncestorContainer;
-    // ha szöveg, akkor veszük a szülő elemet
-    if (context.nodeType === Node.TEXT_NODE) {
-      context = range.commonAncestorContainer.parentNode;
-    }
-    this.ranges.push(new ContextRange(range, context));
+    return this.range;
   }
 
   /**
    * @access public
    * @return {void}
    */
-  createRanges()
+  createRange()
   {
     const selection = window.getSelection();
 
@@ -150,35 +100,8 @@ export class ContextRangeContainer
       range = selection.getRangeAt(0);
     }
     if (range && this.isInContainerRange(range)) {
-      this.ranges = [];
-      if (this.isMultiRange(range)) {
-        let node = range.startContainer.parentNode;
-
-        let clone = range.cloneRange();
-        clone.setEnd(node, node.childNodes.length);
-
-        this.addRange(clone);
-        // köztes elemek kijelölései
-        node = node.nextSibling;
-        while (node !== range.endContainer.parentNode) {
-          // szövegköszti kijelölésnél szükséges a szöveg elem
-          // bekezdések kijelölésnél pedig nem !!!!!!!
-          if (node.nodeType !== Node.TEXT_NODE) {
-            clone = range.cloneRange();
-            clone.setStart(node, 0);
-            clone.setEnd(node, node.childNodes.length);
-            this.addRange(clone);
-          }
-          node = node.nextSibling;
-        }
-        // az utolsó elem kijelölésének létrehozása
-        clone = range.cloneRange();
-        clone.setStart(node, 0);
-        this.addRange(clone);
-      } else {
-        this.addRange(range);
-      }
-      $.event.trigger('ContextRangeContainer::createRanges');
+      this.range = new ContextRange(range);
+      $.event.trigger('ContextRangeContainer::createRange');
     }
   }
 
@@ -190,12 +113,7 @@ export class ContextRangeContainer
    */
   getTextElements()
   {
-    let $elements = $();
-    for (let i = 0; i < this.ranges.length; i++) {
-      const element = this.ranges[i].getTextElement();
-      $elements = $elements.add(element);
-    }
-    return $elements;
+    return $(this.range.getTextElements());
   }
 
   /**
@@ -204,47 +122,42 @@ export class ContextRangeContainer
    * @access public
    * @return {jQuery}
    */
-  getContexts()
+  getContext()
   {
-    let $contexts = $();
-    for (let i = 0; i < this.ranges.length; i++) {
-      const context = this.ranges[i].getContext();
-      $contexts = $contexts.add(context);
-    }
-    return $contexts;
+    return $(this.range.getContext());
   }
 
   /**
-   * Képek lekérdezése
+   * Kép lekérdezése
    *
    * @access public
    * @return {jQuery}
    */
-  getImages()
+  getImage()
   {
-    return this.getContexts().filter('img');
+    return this.getContext().filter('img');
   }
 
   /**
-   * Container-ek visszaadása
+   * Container visszaadása
    *
    * @access public
    * @return {jQuery}
    */
-  getContainers()
+  getContainer()
   {
-    const $contexts = this.getContexts();
-    let $results = $contexts.filter('p,h1,h2,h3,h4,h5,h6,div,td,th').not(this.$container);
-    if ($results.length === 0) {
-      $results = $contexts.parents('p,h1,h2,h3,h4,h5,h6,div,td,th').not(this.$container);
+    const $context = this.getContext();
+    let $result = $context.filter('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+    if ($result.length === 0) {
+      $result = $context.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
     }
-    return $results;
+    return $result;
   }
 
-  onCreateRanges(callback)
+  onCreateRange(callback)
   {
     if (typeof callback === 'function') {
-      $(document).bind('ContextRangeContainer::createRanges', () =>
+      $(document).bind('ContextRangeContainer::createRange', () =>
       {
         callback(this);
       });

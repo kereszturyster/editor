@@ -3,10 +3,9 @@ export class ContextRange
   /**
    * @access public
    * @param {Range} origin
-   * @param {HTMLElement} context
    * @constructor
    */
-  constructor(origin, context)
+  constructor(origin)
   {
     /**
      * @private
@@ -16,36 +15,15 @@ export class ContextRange
 
     /**
      * @private
-     * @type {HTMLElement}
+     * @type {Array<HTMLElement>}
      */
-    this.context = context;
-
-    /**
-     * @private
-     * @type {HTMLElement}
-     */
-    this.element = null;
+    this.elements = null;
 
     /**
      * @private
      * @type {boolean}
      */
-    this.createElement = false;
-  }
-
-  /**
-   * @access public
-   * @return {String}
-   */
-  html()
-  {
-    if (this.element) {
-      return this.element.outerHTML;
-    } else {
-      const tmp = document.createElement('div');
-      tmp.appendChild(this.origin.cloneContents());
-      return tmp.innerHTML;
-    }
+    this.createElements = false;
   }
 
   /**
@@ -54,48 +32,62 @@ export class ContextRange
    */
   getContext()
   {
-    return this.context;
+    // kijelöléshez tartozó elem meghatározása
+    let context = this.origin.commonAncestorContainer;
+    // ha szöveg, akkor veszük a szülő elemet
+    if (context.nodeType === Node.TEXT_NODE) {
+      context = this.origin.commonAncestorContainer.parentNode;
+    }
+    return context;
   }
 
   /**
    * Node lekérdezése a kijelölés alapján. Bekezdésben a teljes szöveg kivan jelölve akor a Node a bekezdés lesz,
    * ha nem akkor létrejön a DOM egy span és azt kapjuk vissza,
    * ha pedig kép akkor azt mivel akkor üres a kijelölés és a $contextus a kép
-   * TODO Kép esetén a perent a Text element
    *
    * @access public
-   * @return {HTMLElement}
+   * @return {Array<HTMLElement>}
    */
-  getTextElement()
+  getTextElements()
   {
-    if (!this.element) {
-      const contextLength = this.context.textContent.length;
+    if (!this.elements) {
+      const context = this.getContext();
+      const contextLength = context.textContent.length;
       const content = this.origin.cloneContents();
 
+      this.elements = [];
       if (content.textContent.length === 0 || contextLength === content.textContent.length) {
-        this.element = this.context;
-
-        this.createElement = false;
+        this.createElements = false;
+        this.elements.push(context);
       } else {
-        this.element = document.createElement('span');
-        this.element.appendChild(content);
+        this.createElements = true;
 
-        this.createElement = true;
+        const content = this.origin.cloneContents();
+        console.log(content.childNodes);
+        const element = document.createElement('span');
+        element.appendChild(content);
+
+        this.elements.push(element);
       }
     }
 
-    return this.element;
+    return this.elements;
   }
 
   /**
    * @access public
    * @return {HTMLElement}
    */
-  createTextElement()
+  createTextElements()
   {
-    if(this.createElement) {
+    if(this.createElements) {
       this.origin.deleteContents();
-      this.origin.insertNode(this.element);
+
+      const elements = this.getTextElements();
+      for (let i = 0; i < elements.length; i++) {
+        this.origin.insertNode(elements[i]);
+      }
     }
   }
 }
