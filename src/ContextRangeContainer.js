@@ -78,15 +78,6 @@ export class ContextRangeContainer
 
   /**
    * @access public
-   * @return {ContextRange}
-   */
-  getRange()
-  {
-    return this.range;
-  }
-
-  /**
-   * @access public
    * @return {void}
    */
   createRange()
@@ -111,9 +102,20 @@ export class ContextRangeContainer
    * @access public
    * @return {jQuery}
    */
+  getElements()
+  {
+    return $(this.range.getElements());
+  }
+
+  /**
+   * Függvény amely vissza adja jQuery objektumban a kijelölt elemeket
+   *
+   * @access public
+   * @return {jQuery}
+   */
   getTextElements()
   {
-    return $(this.range.getTextElements());
+    return this.getElements();
   }
 
   /**
@@ -133,9 +135,10 @@ export class ContextRangeContainer
    * @access public
    * @return {jQuery}
    */
-  getImage()
+  getImages()
   {
-    return this.getContext().filter('img');
+    // TODO HTML segítségével ki lehet jelölni
+    return this.getElements().filter('img');
   }
 
   /**
@@ -144,12 +147,12 @@ export class ContextRangeContainer
    * @access public
    * @return {jQuery}
    */
-  getContainer()
+  getContainers()
   {
-    const $context = this.getContext();
-    let $result = $context.filter('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+    const $elements = this.getElements();
+    let $result = $elements.filter('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
     if ($result.length === 0) {
-      $result = $context.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+      $result = $elements.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
     }
     return $result;
   }

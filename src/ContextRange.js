@@ -17,13 +17,38 @@ export class ContextRange
      * @private
      * @type {Array<HTMLElement>}
      */
-    this.elements = null;
+    this.elements = [];
 
     /**
      * @private
      * @type {boolean}
      */
     this.createElements = false;
+
+    /**
+     * Elemek létrehozása
+     */
+    this.initElements();
+  }
+
+  initElements() {
+    const context = this.getContext();
+    const contextLength = context.textContent.length;
+    const content = this.origin.cloneContents();
+
+    if (content.textContent.length === 0 || contextLength === content.textContent.length) {
+      this.createElements = false;
+      this.elements.push(context);
+    } else {
+      this.createElements = true;
+
+      const content = this.origin.cloneContents();
+      console.log(content.childNodes);
+      const element = document.createElement('span');
+      element.appendChild(content);
+
+      this.elements.push(element);
+    }
   }
 
   /**
@@ -42,36 +67,13 @@ export class ContextRange
   }
 
   /**
-   * Node lekérdezése a kijelölés alapján. Bekezdésben a teljes szöveg kivan jelölve akor a Node a bekezdés lesz,
-   * ha nem akkor létrejön a DOM egy span és azt kapjuk vissza,
-   * ha pedig kép akkor azt mivel akkor üres a kijelölés és a $contextus a kép
+   * Kijelölt elemek
    *
    * @access public
    * @return {Array<HTMLElement>}
    */
-  getTextElements()
+  getElements()
   {
-    if (!this.elements) {
-      const context = this.getContext();
-      const contextLength = context.textContent.length;
-      const content = this.origin.cloneContents();
-
-      this.elements = [];
-      if (content.textContent.length === 0 || contextLength === content.textContent.length) {
-        this.createElements = false;
-        this.elements.push(context);
-      } else {
-        this.createElements = true;
-
-        const content = this.origin.cloneContents();
-        console.log(content.childNodes);
-        const element = document.createElement('span');
-        element.appendChild(content);
-
-        this.elements.push(element);
-      }
-    }
-
     return this.elements;
   }
 
@@ -79,12 +81,12 @@ export class ContextRange
    * @access public
    * @return {HTMLElement}
    */
-  createTextElements()
+  createElements()
   {
     if(this.createElements) {
       this.origin.deleteContents();
 
-      const elements = this.getTextElements();
+      const elements = this.getElements();
       for (let i = 0; i < elements.length; i++) {
         this.origin.insertNode(elements[i]);
       }
