@@ -42,32 +42,25 @@ export class ContextRange
     } else {
       this.createElements = true;
 
-      const content = this.origin.cloneContents();
-      if(this.origin.startContainer === this.origin.endContainer){
-        const element = document.createElement('span');
-        element.appendChild(content);
-        this.elements.push(element);
+      let nodes = [];
+      for (let i = 0; i < content.childNodes.length; i++) {
+        nodes.push(content.childNodes[i]);
       }
-      else {
-        for (let i = 0; i < content.childNodes.length; i++){
-          let node = content.childNodes[i];
-          let element = node;
+      for (let i = 0; i < nodes.length; i++){
+        let element = nodes[i];
 
-          // if(i === 0){
-          //   node = this.origin.startContainer;
-          // }
-          // if(i === content.childNodes.length - 1){
-          //   node = this.origin.startContainer;
-          // }
+        // if(i === 0){
+        //   node = this.origin.startContainer;
+        // }
+        // if(i === content.childNodes.length - 1){
+        //   node = this.origin.startContainer;
+        // }
 
-          if (node.nodeType === Node.TEXT_NODE) {
-            element = document.createElement('span');
-            element.appendChild(node);
-          }
-          console.log(node, element);
-          this.elements.push(element);
+        if(nodes[i].nodeType === Node.TEXT_NODE) {
+          element = document.createElement('span');
+          element.appendChild(nodes[i]);
         }
-
+        this.elements.push(element);
       }
     }
   }

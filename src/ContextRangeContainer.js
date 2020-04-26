@@ -152,7 +152,8 @@ export class ContextRangeContainer
     const $elements = this.getElements();
     let $result = $elements.filter('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
     if ($result.length === 0) {
-      $result = $elements.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+      // $result = $elements.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+      return this.getContext();
     }
     return $result;
   }
