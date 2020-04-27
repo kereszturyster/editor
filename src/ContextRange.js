@@ -2,12 +2,12 @@ class ContextRangeElement {
 
   /**
    * @access public
-   * @param {HTMLElement} element
-   * @param {boolean} createElement
+   * @param {ChildNode} element
+   * @param {boolean} isCreateElement
    * @param {Range} range
    * @constructor
    */
-  constructor(element, range, createElement)
+  constructor(element, range, isCreateElement)
   {
     /**
      * @private
@@ -21,12 +21,11 @@ class ContextRangeElement {
      */
     this.element = element;
 
-
     /**
      * @private
      * @type {boolean}
      */
-    this.createElement = !!createElement;
+    this.isCreateElement = !!isCreateElement;
   }
 
   /**
@@ -40,20 +39,11 @@ class ContextRangeElement {
 
   /**
    * @access public
-   * @return {Range}
-   */
-  getRange()
-  {
-    return this.range;
-  }
-
-  /**
-   * @access public
    * @return {void}
    */
   createElement()
   {
-    if(this.createElement) {
+    if(this.isCreateElement) {
       this.range.deleteContents();
       this.range.insertNode(this.element);
     }
@@ -87,6 +77,9 @@ export class ContextRange
     this.initElements();
   }
 
+  /**
+   * Elemek létrehozása
+   */
   initElements() {
     const context = this.getContext();
     const contextLength = context.textContent.length;
@@ -95,12 +88,15 @@ export class ContextRange
     console.log(content.childNodes);
     // TODO [p, text, p, text, p] text enter stb. lehet.
 
+    let element = null;
     if (content.textContent.length === 0 || contextLength === content.textContent.length) {
-      this.elements.push(new ContextRangeElement(context, this.origin, false));
+      element = context;
+      this.elements.push(new ContextRangeElement(element, this.origin, false));
+
     } else {
       // content.childNodes ha  nincs container elem div, p, h1 stb
       if(content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
-        const element = document.createElement('span');
+        element = document.createElement('span');
         element.appendChild(content);
 
         this.elements.push(new ContextRangeElement(element, this.origin, true));

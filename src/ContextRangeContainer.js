@@ -59,6 +59,15 @@ export class ContextRangeContainer
   }
 
   /**
+   * @access public
+   * @return {ContextRange}
+   */
+  getRange()
+  {
+    return this.range;
+  }
+
+  /**
    * A kijelölés az adott container-ben van
    *
    * @access private
