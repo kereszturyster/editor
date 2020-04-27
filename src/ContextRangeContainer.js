@@ -163,7 +163,7 @@ export class ContextRangeContainer
       return $result;
     }
 
-    return $elements.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+    return $context.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
   }
 
   onCreateRange(callback)
