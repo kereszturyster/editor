@@ -72,28 +72,54 @@ export class ContextRange
     this.elements = [];
 
     /**
-     * Elemek létrehozása
+     * Init
      */
-    this.initElements();
+    this.init();
   }
 
   /**
    * Elemek létrehozása
+   *
+   * @access public
+   * @return {ChildNode}
    */
-  initElements() {
+  getRealContext(){
+    const context = this.getContext();
+
+    let node = this.origin.startContainer;
+    while (node.parentNode !== context) {
+      node = node.parentNode;
+    }
+
+    return node;
+  }
+
+  /**
+   * Init
+   */
+  init() {
     const context = this.getContext();
     const contextLength = context.textContent.length;
     const content = this.origin.cloneContents();
     // TODO childNode lehetnek további gyerek elemei
-    console.log(content.childNodes);
+    console.log(content.childNodes, this.origin);
     // TODO [p, text, p, text, p] text enter stb. lehet.
 
     let element = null;
-    if (content.textContent.length === 0 || contextLength === content.textContent.length) {
+    if (content.textContent.length === 0 || contextLength === content.textContent.length ) {
       element = context;
       this.elements.push(new ContextRangeElement(element, this.origin, false));
 
-    } else {
+    } else if (this.origin.endContainer.nodeType !== Node.TEXT_NODE && this.origin.endOffset === 0) {
+      element = this.getRealContext();
+
+      this.origin = document.createRange();
+      this.origin.setStart(element, 0);
+      this.origin.setEnd(element, element.childNodes.length);
+
+      this.elements.push(new ContextRangeElement(element, this.origin, false));
+    }
+    else {
       // content.childNodes ha  nincs container elem div, p, h1 stb
       if(content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
         element = document.createElement('span');
