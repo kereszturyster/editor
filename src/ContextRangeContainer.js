@@ -102,9 +102,9 @@ export class ContextRangeContainer
    * @access public
    * @return {jQuery}
    */
-  getElements()
+  getHTMLElements()
   {
-    return $(this.range.getElements());
+    return $(this.range.getHTMLElements());
   }
 
   /**
@@ -115,9 +115,7 @@ export class ContextRangeContainer
    */
   getTextElements()
   {
-    const elements = this.getElements();
-    this.range.createElements();
-    return elements;
+    return this.getHTMLElements();
   }
 
   /**
@@ -140,7 +138,7 @@ export class ContextRangeContainer
   getImages()
   {
     // TODO HTML segítségével ki lehet jelölni
-    return this.getElements().filter('img');
+    return this.getHTMLElements().filter('img');
   }
 
   /**
@@ -152,7 +150,7 @@ export class ContextRangeContainer
   getContainers()
   {
     // Elemek között van container
-    const $elements = this.getElements();
+    const $elements = this.getHTMLElements();
     let $result = $elements.filter('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
     if ($result.length > 0) {
       return $result;
