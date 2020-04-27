@@ -3,10 +3,11 @@ class ContextRangeElement {
   /**
    * @access public
    * @param {HTMLElement} element
+   * @param {boolean} createElement
    * @param {Range} range
    * @constructor
    */
-  constructor(element, range)
+  constructor(element, range, createElement)
   {
     /**
      * @private
@@ -19,6 +20,13 @@ class ContextRangeElement {
      * @type {HTMLElement}
      */
     this.element = element;
+
+
+    /**
+     * @private
+     * @type {boolean}
+     */
+    this.createElement = !!createElement;
   }
 
   /**
@@ -37,6 +45,18 @@ class ContextRangeElement {
   getRange()
   {
     return this.range;
+  }
+
+  /**
+   * @access public
+   * @return {void}
+   */
+  createElement()
+  {
+    if(this.createElement) {
+      this.range.deleteContents();
+      this.range.insertNode(this.element);
+    }
   }
 }
 
@@ -62,12 +82,6 @@ export class ContextRange
     this.elements = [];
 
     /**
-     * @private
-     * @type {boolean}
-     */
-    this.isCreateElements = false;
-
-    /**
      * Elemek létrehozása
      */
     this.initElements();
@@ -77,18 +91,19 @@ export class ContextRange
     const context = this.getContext();
     const contextLength = context.textContent.length;
     const content = this.origin.cloneContents();
+    // TODO childNode lehetnek további gyerek elemei
+    console.log(content.childNodes);
+    // TODO [p, text, p, text, p] text enter stb. lehet.
 
     if (content.textContent.length === 0 || contextLength === content.textContent.length) {
-      this.isCreateElements = false;
-      this.elements.push(new ContextRangeElement(context, this.origin));
+      this.elements.push(new ContextRangeElement(context, this.origin, false));
     } else {
-      this.isCreateElements = true;
       // content.childNodes ha  nincs container elem div, p, h1 stb
-      if(this.origin.startContainer === this.origin.endContainer) {
+      if(content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
         const element = document.createElement('span');
         element.appendChild(content);
 
-        this.elements.push(new ContextRangeElement(element, this.origin));
+        this.elements.push(new ContextRangeElement(element, this.origin, true));
       }
 
       // let nodes = [];
@@ -159,19 +174,13 @@ export class ContextRange
 
   /**
    * @access public
-   * @return {HTMLElement}
+   * @return {void}
    */
   createElements()
   {
-    if(this.isCreateElements) {
-      const elements = this.getElements();
-      for (let i = 0; i < elements.length; i++) {
-        const range = elements[i].getRange();
-        const element = elements[i].getElement();
-
-        range.deleteContents();
-        range.insertNode(element);
-      }
+    const elements = this.getElements();
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].createElement();
     }
   }
 }
