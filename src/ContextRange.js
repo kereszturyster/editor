@@ -99,7 +99,6 @@ export class ContextRange
    */
   init() {
     const context = this.getContext();
-    const contextLength = context.textContent.length;
     const content = this.origin.cloneContents();
 
     console.log(content.childNodes, this.origin);
@@ -121,24 +120,29 @@ export class ContextRange
       this.elements.push(new ContextRangeElement(element, this.origin, true));
     }
     // Szöveges elemek vannak kijelölve első és utolsó elemnek
-    else if(content.childNodes.length > 0 && content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
-      element = document.createElement('span');
-      element.appendChild(content);
-
-      this.elements.push(new ContextRangeElement(element, this.origin, true));
-    }
-    // az egész bekezdés ki van jelölve
-    else if (content.textContent.length === 0 || contextLength === content.textContent.length ) {
-      element = context;
-      this.elements.push(new ContextRangeElement(element, this.origin, false));
-    }
     else {
-      // TODO childNode lehetnek további gyerek elemei
-      // TODO [p, text, p, text, p] text enter stb. lehet.
+      const contextTextContent = context.textContent.replace(/[\t\n\r ]+/g, '');
+      const contentTextContent = content.textContent.replace(/[\t\n\r ]+/g, '');
+
+      console.log(contextTextContent.length, contentTextContent.length);
+      // az egész bekezdés ki van jelölve
+      if (contentTextContent.length === 0 || contextTextContent.length === contentTextContent.length ) {
+        element = context;
+        this.elements.push(new ContextRangeElement(element, this.origin, false));
+      }
+      else if(content.childNodes.length > 0 && content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
+        element = document.createElement('span');
+        element.appendChild(content);
+
+        this.elements.push(new ContextRangeElement(element, this.origin, true));
+      }
+      else {
+        // TODO childNode lehetnek további gyerek elemei
+        // TODO [p, text, p, text, p] text enter stb. lehet.
+      }
     }
 
       // content.childNodes ha  nincs container elem div, p, h1 stb
-
 
       // let nodes = [];
       // for (let i = 0; i < content.childNodes.length; i++) {
