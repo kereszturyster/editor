@@ -124,6 +124,7 @@ export class ContextRangeContainer
    */
   getTextElements()
   {
+    // TODO a, span, strong, em, img
     return this.getHTMLElements();
   }
 
