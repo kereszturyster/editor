@@ -101,16 +101,12 @@ export class ContextRange
     const context = this.getContext();
     const contextLength = context.textContent.length;
     const content = this.origin.cloneContents();
-    // TODO childNode lehetnek további gyerek elemei
+
     console.log(content.childNodes, this.origin);
-    // TODO [p, text, p, text, p] text enter stb. lehet.
 
     let element = null;
-    if (content.textContent.length === 0 || contextLength === content.textContent.length ) {
-      element = context;
-      this.elements.push(new ContextRangeElement(element, this.origin, false));
-
-    } else if (this.origin.endContainer.nodeType !== Node.TEXT_NODE && this.origin.endOffset === 0) {
+    // Dupla kattintással kijelölödik a bekezdés
+    if (this.origin.startContainer.nodeType === Node.TEXT_NODE && this.origin.endContainer.nodeType !== Node.TEXT_NODE && this.origin.endOffset === 0) {
       element = this.getRealContext();
 
       this.origin = document.createRange();
@@ -119,14 +115,30 @@ export class ContextRange
 
       this.elements.push(new ContextRangeElement(element, this.origin, false));
     }
-    else {
-      // content.childNodes ha  nincs container elem div, p, h1 stb
-      if(content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
-        element = document.createElement('span');
-        element.appendChild(content);
+    // Kép van csak kijelölve
+    else if(content.childNodes.length === 1 && content.childNodes[0].nodeName && content.childNodes[0].nodeName.toLowerCase() === 'img') {
+      element = content.childNodes[0];
+      this.elements.push(new ContextRangeElement(element, this.origin, true));
+    }
+    // Szöveges elemek vannak kijelölve első és utolsó elemnek
+    else if(content.childNodes.length > 0 && content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
+      element = document.createElement('span');
+      element.appendChild(content);
 
-        this.elements.push(new ContextRangeElement(element, this.origin, true));
-      }
+      this.elements.push(new ContextRangeElement(element, this.origin, true));
+    }
+    // az egész bekezdés ki van jelölve
+    else if (content.textContent.length === 0 || contextLength === content.textContent.length ) {
+      element = context;
+      this.elements.push(new ContextRangeElement(element, this.origin, false));
+    }
+    else {
+      // TODO childNode lehetnek további gyerek elemei
+      // TODO [p, text, p, text, p] text enter stb. lehet.
+    }
+
+      // content.childNodes ha  nincs container elem div, p, h1 stb
+
 
       // let nodes = [];
       // for (let i = 0; i < content.childNodes.length; i++) {
@@ -148,7 +160,6 @@ export class ContextRange
       //
       //   this.elements.push(element);
       // }
-    }
   }
 
   /**
