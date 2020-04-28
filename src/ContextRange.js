@@ -95,6 +95,15 @@ export class ContextRange
   }
 
   /**
+   * @access public
+   * @return {boolean}
+   */
+  isWhitespaceNode( node )
+  {
+    return node.nodeType === Node.TEXT_NODE && !(/[^\t\n\r ]/.test(node.textContent));
+  }
+
+  /**
    * Init
    */
   init() {
@@ -130,40 +139,24 @@ export class ContextRange
         element = context;
         this.elements.push(new ContextRangeElement(element, this.origin, false));
       }
-      else if(content.childNodes.length > 0 && content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
+      else if(content.childNodes[0].nodeType === Node.TEXT_NODE && content.childNodes[content.childNodes.length-1].nodeType === Node.TEXT_NODE) {
         element = document.createElement('span');
         element.appendChild(content);
 
         this.elements.push(new ContextRangeElement(element, this.origin, true));
       }
       else {
+        const nodes = [];
         // TODO childNode lehetnek további gyerek elemei
         // TODO [p, text, p, text, p] text enter stb. lehet.
+        for(let i = 0; i < content.childNodes.length; i++) {
+          if(!this.isWhitespaceNode(content.childNodes[i])) {
+            nodes.push(content.childNodes[i]);
+          }
+        }
+        console.log(nodes);
       }
     }
-
-      // content.childNodes ha  nincs container elem div, p, h1 stb
-
-      // let nodes = [];
-      // for (let i = 0; i < content.childNodes.length; i++) {
-      //   nodes.push(content.childNodes[i]);
-      // }
-      // // TODO több range kell
-      // for (let i = 0; i < nodes.length; i++){
-      //   let element = nodes[i];
-      //   if(nodes[i].nodeType === Node.TEXT_NODE) {
-      //     element = document.createElement('span');
-      //     element.appendChild(nodes[i]);
-      //   }
-      //   else if(i === 0 || i === nodes.length - 1){
-      //     element = document.createElement('span');
-      //     while(nodes[i].firstChild) {
-      //       element.appendChild(nodes[i].firstChild);
-      //     }
-      //   }
-      //
-      //   this.elements.push(element);
-      // }
   }
 
   /**
