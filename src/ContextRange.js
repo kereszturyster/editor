@@ -44,7 +44,6 @@ class ContextRangeElement {
   createElement()
   {
     if(this.isCreateElement) {
-      this.range.deleteContents();
       this.range.insertNode(this.element);
     }
   }
@@ -96,11 +95,32 @@ export class ContextRange
 
   /**
    * @access public
+   * @param {ChildNode} node
    * @return {boolean}
    */
   isWhitespaceNode( node )
   {
     return node.nodeType === Node.TEXT_NODE && !(/[^\t\n\r ]/.test(node.textContent));
+  }
+
+  /**
+   * @access public
+   * @param {ChildNode} node
+   * @return {boolean}
+   */
+  isTextElement( node )
+  {
+    return ContextRange.TEXT_ELEMENTS.includes(node.nodeName.toLowerCase());
+  }
+
+  /**
+   * @access public
+   * @param {ChildNode} node
+   * @return {boolean}
+   */
+  isContainerElement( node )
+  {
+    return ContextRange.CONTAINER_ELEMENTS.includes(node.nodeName.toLowerCase());
   }
 
   /**
@@ -154,7 +174,24 @@ export class ContextRange
             nodes.push(content.childNodes[i]);
           }
         }
-        console.log(nodes);
+
+        element = document.createElement('span');
+        while(nodes[0].firstChild) {
+          element.appendChild(nodes[0].firstChild);
+        }
+        nodes[0] = element;
+
+        element = document.createElement('span');
+        while(nodes[nodes.length-1].firstChild) {
+          element.appendChild(nodes[nodes.length-1].firstChild);
+        }
+        nodes[nodes.length-1] = element;
+
+        for(let i = 0; i < nodes.length; i++) {
+          this.elements.push(new ContextRangeElement(nodes[i], this.origin, true));
+        }
+
+        this.createElements();
       }
     }
   }
@@ -208,9 +245,13 @@ export class ContextRange
    */
   createElements()
   {
+    this.origin.deleteContents();
     const elements = this.getElements();
     for (let i = 0; i < elements.length; i++) {
       elements[i].createElement();
     }
   }
 }
+
+ContextRange.CONTAINER_ELEMENTS = 'p,h1,h2,h3,h4,h5,h6,div';
+ContextRange.TEXT_ELEMENTS = 'a,span,strong,em,img';

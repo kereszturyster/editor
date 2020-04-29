@@ -124,7 +124,7 @@ export class ContextRangeContainer
    */
   getTextElements()
   {
-    // TODO a, span, strong, em, img
+    // TODO ContextRange.TEXT_ELEMENTS
     return this.getHTMLElements();
   }
 
@@ -147,7 +147,6 @@ export class ContextRangeContainer
    */
   getImages()
   {
-    // TODO HTML segítségével ki lehet jelölni
     return this.getHTMLElements().filter('img');
   }
 
@@ -161,19 +160,19 @@ export class ContextRangeContainer
   {
     // Elemek között van container
     const $elements = this.getHTMLElements();
-    let $result = $elements.filter('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+    let $result = $elements.filter(ContextRange.CONTAINER_ELEMENTS).not(this.$container);
     if ($result.length > 0) {
       return $result;
     }
 
     // Ha context container
     const $context = this.getContext();
-    $result = $context.filter('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+    $result = $context.filter(ContextRange.CONTAINER_ELEMENTS).not(this.$container);
     if ($result.length > 0) {
       return $result;
     }
 
-    return $context.closest('p,h1,h2,h3,h4,h5,h6,div').not(this.$container);
+    return $context.closest(ContextRange.CONTAINER_ELEMENTS).not(this.$container);
   }
 
   onCreateRange(callback)
