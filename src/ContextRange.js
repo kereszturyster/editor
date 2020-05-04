@@ -44,6 +44,7 @@ class ContextRangeElement {
   createElement()
   {
     if(this.isCreateElement) {
+      this.range.deleteContents();
       this.range.insertNode(this.element);
     }
   }
@@ -191,7 +192,7 @@ export class ContextRange
           this.elements.push(new ContextRangeElement(nodes[i], this.origin, true));
         }
 
-        this.createElements();
+        // this.createElements();
       }
     }
   }
@@ -245,7 +246,6 @@ export class ContextRange
    */
   createElements()
   {
-    this.origin.deleteContents();
     const elements = this.getElements();
     for (let i = 0; i < elements.length; i++) {
       elements[i].createElement();
