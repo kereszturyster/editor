@@ -1,54 +1,4 @@
-class ContextRangeElement {
-
-  /**
-   * @access public
-   * @param {ChildNode} element
-   * @param {boolean} isCreateElement
-   * @param {Range} range
-   * @constructor
-   */
-  constructor(element, range, isCreateElement)
-  {
-    /**
-     * @private
-     * @type {Range}
-     */
-    this.range = range;
-
-    /**
-     * @private
-     * @type {HTMLElement}
-     */
-    this.element = element;
-
-    /**
-     * @private
-     * @type {boolean}
-     */
-    this.isCreateElement = !!isCreateElement;
-  }
-
-  /**
-   * @access public
-   * @return {HTMLElement}
-   */
-  getElement()
-  {
-    return this.element;
-  }
-
-  /**
-   * @access public
-   * @return {void}
-   */
-  createElement()
-  {
-    if(this.isCreateElement) {
-      this.range.deleteContents();
-      this.range.insertNode(this.element);
-    }
-  }
-}
+import {ContextRangeElement} from "./ContextRangeElement";
 
 export class ContextRange
 {
@@ -133,7 +83,7 @@ export class ContextRange
     const context = this.getContext();
     const content = this.origin.cloneContents();
 
-    console.log(content.childNodes, this.origin);
+    // console.log(content.childNodes, this.origin);
 
     let element = null;
     // Dupla kattintással kijelölödik a bekezdés
