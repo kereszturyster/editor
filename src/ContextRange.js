@@ -83,7 +83,8 @@ export class ContextRange
    * @access public
    * @return {ChildNode}
    */
-  getRealContext(){
+  getRealContext()
+  {
     const context = this.getContext();
 
     let node = this.origin.startContainer;
@@ -127,7 +128,8 @@ export class ContextRange
   /**
    * Init
    */
-  init() {
+  init()
+  {
     const context = this.getContext();
     const content = this.origin.cloneContents();
 
